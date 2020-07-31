@@ -11,7 +11,7 @@ object ParentDAO {
   }
 
   def read(parentId: UUID): DB[Option[Parent]] =
-    DB(parentTable.get(parentId))
+    DB.successful(parentTable.get(parentId))
 
   def delete(parentId: UUID): DB[Unit] = {
     for {

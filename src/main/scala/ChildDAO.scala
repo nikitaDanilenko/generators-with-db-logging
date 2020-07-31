@@ -10,8 +10,10 @@ object ChildDAO {
       result <- ParentDAO.read(child.parentId)
       insertion <- result match {
         case Some(_) =>
-          childTable += (child.id -> child)
-          DB.successful(child)
+          DB { () =>
+            childTable += (child.id -> child)
+            child
+          }
         case _ => DB.failed(s"Parent constraint violated for child with id ${child.id}")
       }
     } yield insertion
@@ -25,6 +27,9 @@ object ChildDAO {
 
   def delete(childId: UUID): DB[Unit] = {
     childTable.remove(childId)
-    DB.successful(())
+    DB {() =>
+      childTable.remove(childId)
+      ()
+    }
   }
 }
