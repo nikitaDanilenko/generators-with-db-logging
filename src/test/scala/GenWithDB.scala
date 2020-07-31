@@ -15,7 +15,7 @@ object GenWithDB {
 
   type GenWithDB[A] = WriterT[Gen, DBVector, A]
 
-  def tell[A](actions: Vector[DB[A]]): GenWithDB[Unit] =
+  def tell[A](actions: DBVector): GenWithDB[Unit] =
     WriterT.tell[Gen, DBVector](actions)
 
   def tellSingle[A](action: DB[A]): GenWithDB[Unit] =
