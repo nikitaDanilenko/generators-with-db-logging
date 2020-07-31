@@ -1,7 +1,6 @@
-import GenWithDB.GenWithDB
-import org.scalacheck.{Prop, Properties}
-import _root_.GenWithDB._
+import GenWithDB.{GenWithDB, _}
 import cats.instances.vector._
+import org.scalacheck.{Prop, Properties}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
@@ -17,7 +16,8 @@ object PropertyTest extends Properties("PropertyTest") {
 
   property("Children for parent inserted correctly") = Prop.forAll(parentChildrenGen.run) {
     case (actions, parentWithChildren) =>
-      DB.run(DB.sequence(actions))
+      //Without the following line, no actions are executed, and the test fails.
+      DB.run(DB.seq(actions))
       val childrenInDB = Await.result(DB.run(ChildDAO.findByParentId(parentWithChildren.parent.id)), Duration.Inf)
       val parentInDB = Await.result(DB.run(ParentDAO.read(parentWithChildren.parent.id)), Duration.Inf)
       val parentProperty = parentInDB.contains(parentWithChildren.parent)
