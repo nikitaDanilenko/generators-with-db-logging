@@ -24,4 +24,11 @@ object GenWithDB {
   def liftF[A](gen: Gen[A]): GenWithDB[A] =
     WriterT.liftF[Gen, DBVector, A](gen)
 
+  def nonEmptyCollectionOf[A](gen: GenWithDB[A]): GenWithDB[Vector[A]] = for {
+    list <- liftF(Gen.nonEmptyListOf(Gen.const(())))
+    xs <- liftF(Gen.sequence[Vector[(DBVector, A)], (DBVector, A)](Vector.fill(list.length)(gen).map(_.run)))
+    actionsResults = xs.unzip
+    _ <- tell(actionsResults._1.flatten)
+  } yield actionsResults._2
+
 }
