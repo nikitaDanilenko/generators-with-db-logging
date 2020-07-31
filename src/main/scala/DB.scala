@@ -11,6 +11,8 @@ case class DB[A](value: A) {
 object DB {
   def successful[A](a: A): DB[A] = DB(a)
 
+  def failed[A](message: String): DB[A] = throw new Throwable(message)
+
   def sequence[A](actions: Vector[DB[A]]): DB[Vector[A]] =
     DB(actions.map(_.value))
 
