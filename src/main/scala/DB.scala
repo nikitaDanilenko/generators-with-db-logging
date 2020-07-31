@@ -1,3 +1,5 @@
+import scala.concurrent.Future
+
 case class DB[A](value: A) {
 
   def flatMap[B](f: A => DB[B]): DB[B] =
@@ -16,4 +18,5 @@ object DB {
   def sequence[A](actions: Vector[DB[A]]): DB[Vector[A]] =
     DB(actions.map(_.value))
 
+  def run[A](action: DB[A]): Future[A] = Future.successful(action.value)
 }
